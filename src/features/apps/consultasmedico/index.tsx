@@ -27,7 +27,12 @@ interface DurList {
 }
 interface PosologiaOpt { id_posologia: number; descricao_posologia: string; posologia_livre: number; }
 interface DoencaRow { id_histmed: number; doenca_nome: string; doenca_cid: string; }
-interface DoencaFamiliar { id_histmed: number; doenca_familiar_nome: string; }
+interface DoencaFamiliar {
+  id_histmed: number;
+  id_doenca_familiar: number;
+  doenca_familiar_nome: string;
+  doenca_familiar_cid: string;
+}
 interface AlergiaOpt { id_alergia: number; alergia_nome: string; alergia_cid: string; }
 interface DoencaOpt { id_doenca: number; doenca_nome: string; doenca_cid: string; }
 interface DoencaFamOpt {
@@ -198,13 +203,13 @@ export default function ConsultaGestaoPage() {
   const list = doencasFamOpcoes
     .filter(d =>
       d.doenca_familiar_nome.toLowerCase().includes(l) ||
-      d.doenca_familiar_cid.toLowerCase().includes(l)
+      (d.doenca_familiar_cid ?? "").toLowerCase().includes(l)
     )
     .slice(0, 8);
   setDoencaFamSuggestions(list);
   const exact = doencasFamOpcoes.find(d =>
     d.doenca_familiar_nome.toLowerCase() === l ||
-    d.doenca_familiar_cid.toLowerCase() === l
+    (d.doenca_familiar_cid ?? "").toLowerCase() === l
   );
   setNovaDoencaFamId(exact ? exact.id_doenca_familiar : "");
 }
@@ -474,43 +479,70 @@ export default function ConsultaGestaoPage() {
           </TabsContent>
 
           <TabsContent value="doencasfamiliares">
-            <Card className="shadow-sm">
-              <CardHeader><CardTitle>Doenças Familiares</CardTitle></CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[150px] mb-4">
-                  <Table className="w-full">
-                    <TableHeader><TableRow><TableHead>Doença Familiar</TableHead></TableRow></TableHeader>
-                    <TableBody>
-                      {doencasFamiliares.map((d, i) => (<TableRow key={i}><TableCell>{d.doenca_familiar_nome}</TableCell></TableRow>))}
-                      {doencasFamiliares.length === 0 && (<TableRow><TableCell className="text-center">Sem registros</TableCell></TableRow>)}
-                    </TableBody>
-                  </Table>
-                </ScrollArea>
+  <Card className="shadow-sm">
+    <CardHeader><CardTitle>Doenças Familiares</CardTitle></CardHeader>
+    <CardContent>
+      <ScrollArea className="h-[150px] mb-4">
+        <Table className="w-full">
+          <TableHeader>
+            <TableRow>
+              <TableHead>Doença Familiar</TableHead>
+              <TableHead>CID</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {doencasFamiliares.map((d, i) => (
+              <TableRow key={i}>
+                <TableCell>{d.doenca_familiar_nome}</TableCell>
+                <TableCell>{d.doenca_familiar_cid}</TableCell>
+              </TableRow>
+            ))}
+            {doencasFamiliares.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={2} className="text-center">
+                  Sem registros
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </ScrollArea>
 
-                <div className="relative w-full max-w-sm">
-                  <Input placeholder="Digite doença familiar..." value={novaDoencaFamName} onChange={e => handleDoencaFamChange(e.target.value)} />
-                  {doencaFamSuggestions.length > 0 && novaDoencaFamName && (
-  <ul className="absolute bg-white border rounded mt-1 z-10 w-full max-h-40 overflow-y-auto">
-    {doencaFamSuggestions.map(d => (
-      <li
-        key={d.id_doenca_familiar}
-        className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
-        onClick={() => {
-          setNovaDoencaFamName(d.doenca_familiar_nome);
-          setNovaDoencaFamId(d.id_doenca_familiar);
-          setDoencaFamSuggestions([]);
-        }}
+      <div className="relative w-full max-w-sm">
+        <Input
+          placeholder="Digite doença familiar ou CID..."
+          value={novaDoencaFamName}
+          onChange={e => handleDoencaFamChange(e.target.value)}
+        />
+        {doencaFamSuggestions.length > 0 && novaDoencaFamName && (
+          <ul className="absolute bg-white border rounded mt-1 z-10 w-full max-h-40 overflow-y-auto">
+            {doencaFamSuggestions.map(d => (
+              <li
+                key={d.id_doenca_familiar}
+                className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
+                onClick={() => {
+                  setNovaDoencaFamName(d.doenca_familiar_nome);
+                  setNovaDoencaFamId(d.id_doenca_familiar);
+                  setDoencaFamSuggestions([]);
+                }}
+              >
+                {d.doenca_familiar_nome} ({d.doenca_familiar_cid})
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <Button
+        className="mt-2"
+        onClick={addDoencaFamiliar}
+        disabled={!novaDoencaFamId}
       >
-        {d.doenca_familiar_nome} ({d.doenca_familiar_cid})
-      </li>
-    ))}
-  </ul>
-)}
-                </div>
-                <Button className="mt-2" onClick={addDoencaFamiliar} disabled={!novaDoencaFamId}>Adicionar</Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
+        Adicionar
+      </Button>
+    </CardContent>
+  </Card>
+</TabsContent>
 
           <TabsContent value="prescricoes">
             <Card className="shadow-sm">
