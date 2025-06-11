@@ -291,7 +291,7 @@ export default function ProfissionaisPage() {
       else {
         const parts = val.split(" ");
         if (parts.length < 2) m = "Informe nome e sobrenome.";
-        else if (parts.some(p => p.length < 3)) m = "Cada parte ≥3 letras.";
+        else if (parts.some(p => p.length < 2)) m = "Cada parte ≥2 letras.";
         else if (!parts.every(p => /^[A-ZÀ-Ÿ][a-zà-ÿ]+$/.test(p)))
           m = "Cada parte inicia com maiúscula e só letras.";
       }

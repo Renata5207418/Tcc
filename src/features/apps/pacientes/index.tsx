@@ -135,8 +135,8 @@ const getNomeError = (raw: string) => {
   const parts = v.split(" ");
   if (parts.length < 2) return "Informe nome e sobrenome.";
   if (v.length < 6 || v.length > 60) return "6–60 caracteres.";
-  if (parts.some(p => p.length < 3 || !NAME_PART_RE.test(p)))
-    return "Cada parte deve ter ≥3 letras e iniciar com maiúscula.";
+  if (parts.some(p => p.length < 2 || !NAME_PART_RE.test(p)))
+    return "Cada parte deve ter ≥2 letras e iniciar com maiúscula.";
   return "";
 };
 const EMAIL_RE =
